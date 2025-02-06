@@ -9,7 +9,10 @@ services:
     working_dir: /home/python/video-index
 
   shell:
+    entrypoint:
+      - /bin/bash
     image: ghcr.io/williamjacksn/video-index
     init: true
     volumes:
       - ./:/home/python/video-index
+    working_dir: /home/python/video-index
