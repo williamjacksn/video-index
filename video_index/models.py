@@ -10,6 +10,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
     _version: int = None
 
     def _table_exists(self, table_name: str) -> bool:
+        log.debug(f'Searching database for table {table_name!r}')
         sql = '''
             select name
             from sqlite_master
@@ -20,8 +21,10 @@ class VideoIndexModel(fort.SQLiteDatabase):
             'name': table_name,
         }
         t = self.q_val(sql, params)
-        if t and t == 'table_name':
+        if t and t == table_name:
+            log.debug(f'Table {table_name!r} found')
             return True
+        log.debug(f'Table {table_name!r} not found')
         return False
 
     def migrate(self):
