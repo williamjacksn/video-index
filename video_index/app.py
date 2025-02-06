@@ -23,4 +23,4 @@ def index():
 
 def main():
     video_index.models.get_model().migrate()
-    waitress.serve(app)
+    waitress.serve(app, ident=None)
