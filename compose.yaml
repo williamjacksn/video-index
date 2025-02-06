@@ -1,0 +1,15 @@
+services:
+  pip-compile:
+    entrypoint:
+      - /home/python/venv/bin/pip-compile
+    image: ghcr.io/williamjacksn/pip-tools:py3.13
+    init: true
+    volumes:
+      - ./:/home/python/video-index
+    working_dir: /home/python/video-index
+
+  shell:
+    image: ghcr.io/williamjacksn/video-index
+    init: true
+    volumes:
+      - ./:/home/python/video-index
