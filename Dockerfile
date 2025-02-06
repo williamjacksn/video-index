@@ -9,7 +9,7 @@ COPY --chown=python:python requirements.txt /home/python/video-index/requirement
 RUN /home/python/venv/bin/pip install --no-cache-dir --requirement /home/python/video-index/requirements.txt
 
 ENV HOME="/home/python" \
-    PATH="${HOME}/venv/bin:${PATH}" \
+    PATH="/home/python/venv/bin:${PATH}" \
     PYTHONDONTWRITEBYTECODE="1" \
     PYTHONUNBUFFERED="1" \
     TZ="Etc/UTC"
