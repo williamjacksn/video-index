@@ -9,6 +9,10 @@ def _base(body_content: tuple[fx.FT]) -> fx.FT:
             fx.Meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no'),
             fx.Title('Video Index'),
             fx.Link(
+                href='/favicon.svg',
+                rel='icon'
+            ),
+            fx.Link(
                 crossorigin='anonymous',
                 href=f'https://unpkg.com/bootstrap@{v.bs}/dist/css/bootstrap.css',
                 integrity='sha384-qAlWxD5RDF+aEdUc1Z7GR/tE4zYjX1Igo/LrIexlnzM6G63a6F1fXZWpZKSrSW86',
@@ -36,6 +40,23 @@ def _base(body_content: tuple[fx.FT]) -> fx.FT:
         ),
         lang='en'
     )
+
+
+def favicon():
+    content = fx.Svg(
+        cls='bi bi-film',
+        fill='currentColor',
+        height='16',
+        viewBox='0 0 16 16',
+        width='16',
+        xmlns='http://www.w3.org/2000/svg'
+    )(
+        fx.ft(
+            'path',
+            d='M0 1a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm4 0v6h8V1zm8 8H4v6h8zM1 1v2h2V1zm2 3H1v2h2zM1 7v2h2V7zm2 3H1v2h2zm-2 3v2h2v-2zM15 1h-2v2h2zm-2 3v2h2V4zm2 3h-2v2h2zm-2 3v2h2v-2zm2 3h-2v2h2z'
+        )
+    )
+    return fx.to_xml((content,))
 
 
 def index():

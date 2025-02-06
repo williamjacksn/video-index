@@ -21,6 +21,11 @@ def index():
     return video_index.templates.index()
 
 
+@app.route('/favicon.svg')
+def favicon():
+    return flask.Response(video_index.templates.favicon(), mimetype='image/svg+xml')
+
+
 def main():
     video_index.models.get_model().migrate()
     waitress.serve(app, ident=None)
