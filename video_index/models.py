@@ -28,8 +28,8 @@ class Location:
     def tr(self) -> fx.FT:
         return fx.Tr()(
             fx.Td(fx.Code(self.root_folder)),
-            fx.Td(self.last_scan_started_at.astimezone(zoneinfo.ZoneInfo('America/Chicago'))),
-            fx.Td(self.last_scan_completed_at.astimezone(zoneinfo.ZoneInfo('America/Chicago')))
+            fx.Td(self.last_scan_started_at.astimezone(zoneinfo.ZoneInfo('America/Chicago')) if self.last_scan_started_at else ''),
+            fx.Td(self.last_scan_completed_at.astimezone(zoneinfo.ZoneInfo('America/Chicago')) if self.last_scan_completed_at else '')
         )
 
 
@@ -73,8 +73,8 @@ class VideoIndexModel(fort.SQLiteDatabase):
         return [
             Location(
                 row['root_folder'],
-                datetime.datetime.fromisoformat(row['last_scan_started_at'] or '2000-01-01T00:00:00Z'),
-                datetime.datetime.fromisoformat(row['last_scan_completed_at'] or '2000-01-01T00:00:00Z'),
+                datetime.datetime.fromisoformat(row['last_scan_started_at']) if row['last_scan_started_at'] else None,
+                datetime.datetime.fromisoformat(row['last_scan_completed_at']) if row['last_scan_completed_at'] else None
             )
             for row in self.q(sql)
         ]
