@@ -22,16 +22,7 @@ def _base(body_content: tuple[fx.FT]) -> fx.FT:
             )
         ),
         fx.Body(
-            fx.Div(
-                fx.Div(
-                    fx.Div(
-                        *body_content,
-                        klass='col'
-                    ),
-                    klass='row'
-                ),
-                klass='container-fluid'
-            ),
+            fx.Div(cls='container-fluid')(*body_content),
             fx.Script(
                 crossorigin='anonymous',
                 integrity='sha384-5xO2n1cyGKAe630nacBqFQxWoXjUIkhoc/FxQrWM07EIZ3TuqkAsusDeyPDOIeid',
@@ -48,5 +39,12 @@ def _base(body_content: tuple[fx.FT]) -> fx.FT:
 
 
 def index():
-    content = fx.Div('Hello!'),
-    return fx.to_xml(_base(content))
+    content = fx.Div(cls='pt-3 row')(
+        fx.Div(cls='col')(
+            fx.H1(
+                fx.I(cls='bi-person-raised-hand'),
+                ' Hello!'
+            )
+        )
+    )
+    return fx.to_xml(_base((content,)))
