@@ -24,9 +24,26 @@ class File:
                      src=flask.url_for('files_get', file_id=self.id)),
             fx.Div(cls='card-body')(
                 fx.H5(cls='card-title')(self.file_path.name),
-                fx.H6(cls='card-subtitle mb-2 text-body-secondary')(self.file_path.parent),
-                fx.P(cls='card-text')(self.notes or '(No notes)'),
+                fx.H6(cls='card-subtitle mb-2 text-body-secondary')(
+                    fx.Small(self.file_path.parent)
+                ),
+                self.notes_control,
             )
+        )
+
+    @property
+    def editable_note(self) -> fx.FT:
+        return fx.Form(hx_post=flask.url_for('files_update_notes', file_id=self.id), hx_swap='outerHTML')(
+            fx.Input(name='file-id', type='hidden', value=self.id),
+            fx.Textarea(cls='form-control mb-2', name='notes')(self.notes),
+            fx.Button(cls='btn btn-outline-primary', type='submit')('Save')
+        )
+
+    @property
+    def notes_control(self) -> fx.FT:
+        return fx.P(cls='card-text', hx_get=flask.url_for('files_editable_note', file_id=self.id),
+                    hx_swap='outerHTML', role='button')(
+            self.notes or '(No notes)'
         )
 
 
@@ -155,6 +172,18 @@ class VideoIndexModel(fort.SQLiteDatabase):
             File(pathlib.Path(row['file_path']).resolve(), row['id'], row['notes'])
             for row in self.q(sql, params)
         ]
+
+    def files_update_notes(self, file_id: str, notes: str):
+        sql = '''
+            update files
+            set notes = :notes
+            where id = :id
+        '''
+        params = {
+            'id': file_id,
+            'notes': notes,
+        }
+        self.u(sql, params)
 
     def locations_add(self, root_folder: str):
         sql = '''

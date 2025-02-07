@@ -28,10 +28,26 @@ def favicon():
     return flask.Response(te.favicon(), mimetype='image/svg+xml')
 
 
+@app.route('/files/editable-note/<file_id>')
+def files_editable_note(file_id: str):
+    f = m.get_model().files_get(file_id)
+    return te.files_editable_note(f)
+
+
 @app.route('/files/get/<file_id>')
 def files_get(file_id: str):
     f = m.get_model().files_get(file_id)
     return flask.send_file(f.file_path)
+
+
+@app.route('/files/update-notes', methods=['POST'])
+def files_update_notes():
+    file_id = flask.request.values.get('file-id')
+    notes = flask.request.values.get('notes')
+    model = m.get_model()
+    model.files_update_notes(file_id, notes)
+    f = model.files_get(file_id)
+    return te.files_update_notes(f)
 
 
 @app.route('/locations')

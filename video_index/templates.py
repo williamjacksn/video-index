@@ -96,6 +96,14 @@ def favicon() -> str:
     return fx.to_xml((content,))
 
 
+def files_editable_note(file: m.File) -> str:
+    return fx.to_xml(file.editable_note)
+
+
+def files_update_notes(file: m.File) -> str:
+    return fx.to_xml(file.notes_control)
+
+
 def index(files: list[m.File]) -> str:
     content_col = fx.Div(cls='col-12 col-sm-9 col-md-7 col-lg-6 col-xl-5 col-xxl-4')
     if files:
