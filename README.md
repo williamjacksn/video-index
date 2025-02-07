@@ -8,11 +8,14 @@ This is a web-based application to keep track of video files on your local disk.
 graph TD
     a(app)
     m(models)
-    t(templates)
+    ta(tasks)
+    te(templates)
     v(versions)
 
-    a --> m
-    a --> t
-    t --> m
-    t --> v
+    a  --> m
+    a  --> ta
+    a  --> te
+    ta --> m
+    te --> m
+    te --> v
 ```
