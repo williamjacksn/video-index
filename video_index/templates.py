@@ -44,17 +44,22 @@ def _base(*args: fx.FT) -> fx.FT:
     )
 
 
-def _nav(active_page: str = 'home') -> fx.FT:
+def _nav(active_page: str = 'files') -> fx.FT:
     pages = [
         {
-            'title': 'Home',
+            'title': 'Files',
             'href': flask.url_for('index'),
-            'active': active_page == 'home',
+            'active': active_page == 'files',
         },
         {
             'title': 'Locations',
             'href': flask.url_for('locations'),
             'active': active_page == 'locations',
+        },
+        {
+            'title': 'Suffixes',
+            'href': flask.url_for('suffixes'),
+            'active': active_page == 'suffixes',
         }
     ]
     nav_ul = fx.Ul(cls='nav nav-tabs')
@@ -67,7 +72,7 @@ def _nav(active_page: str = 'home') -> fx.FT:
                 fx.A(cls=cls, href=p.get('href'))(p.get('title'))
             )
         )
-    return fx.Div(cls='pt-3 row')(
+    return fx.Nav(cls='pt-3 row')(
         fx.Div(cls='col-12')(
             nav_ul
         )
@@ -91,8 +96,22 @@ def favicon() -> str:
     return fx.to_xml((content,))
 
 
-def index() -> str:
-    return fx.to_xml(_base(_nav()))
+def index(files: list[m.File]) -> str:
+    content_col = fx.Div(cls='col-12 col-sm-9 col-md-7 col-lg-6 col-xl-5 col-xxl-4')
+    if files:
+        content_col(*(f.card for f in files))
+    else:
+        content_col(
+            'No files found. Scan a ',
+            fx.A(href=flask.url_for('locations'))('location'),
+            ' and enable a ',
+            fx.A(href=flask.url_for('suffixes'))('suffix'),
+            ' first.'
+        )
+    return fx.to_xml(_base(
+        _nav(active_page='files'),
+        fx.Main(cls='pt-3 row')(content_col)
+    ))
 
 
 def locations(locs: list[m.Location]) -> str:
@@ -120,10 +139,31 @@ def locations(locs: list[m.Location]) -> str:
         ),
         fx.Div(cls='pt-3 row')(
             fx.Div(cls='col')(
-                fx.Table(cls='d-block table')(
+                fx.Table(cls='align-middle d-block table')(
                     m.Location.thead,
                     tbody
                 )
             )
         )
+    ))
+
+
+def suffixes(suffix_counts: list[m.SuffixCount]) -> str:
+    content_col = fx.Div(cls='col')
+    if suffix_counts:
+        content_col(
+            fx.Table(cls='align-middle d-block table')(
+                m.SuffixCount.thead,
+                fx.Tbody(*(s.tr for s in suffix_counts))
+            )
+        )
+    else:
+        content_col(
+            'No suffixes found. Scan a ',
+            fx.A(href=flask.url_for('locations'))('location'),
+            ' first.'
+        )
+    return fx.to_xml(_base(
+        _nav(active_page='suffixes'),
+        fx.Div(cls='pt-3 row')(content_col)
     ))

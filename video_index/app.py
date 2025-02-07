@@ -19,12 +19,19 @@ def before_request():
 
 @app.route('/')
 def index():
-    return te.index()
+    files = m.get_model().files_list()
+    return te.index(files)
 
 
 @app.route('/favicon.svg')
 def favicon():
     return flask.Response(te.favicon(), mimetype='image/svg+xml')
+
+
+@app.route('/files/get/<file_id>')
+def files_get(file_id: str):
+    f = m.get_model().files_get(file_id)
+    return flask.send_file(f.file_path)
 
 
 @app.route('/locations')
@@ -49,6 +56,20 @@ def locations_scan():
     loc = m.get_model().locations_get(root_folder)
     if loc:
         ta.scheduler.add_job(ta.scan_location, args=[loc.root_folder])
+    return '', 204
+
+
+@app.route('/suffixes')
+def suffixes():
+    suffix_counts = m.get_model().suffixes_count()
+    return te.suffixes(suffix_counts)
+
+
+@app.route('/suffixes/enable', methods=['POST'])
+def suffixes_enable():
+    trigger_name = flask.request.headers.get('hx-trigger-name')
+    suffix = pathlib.Path(trigger_name).suffix
+    m.get_model().suffixes_enable(suffix, trigger_name in flask.request.values)
     return '', 204
 
 

@@ -4,6 +4,7 @@ import flask
 import fort
 import logging
 import pathlib
+import secrets
 import zoneinfo
 
 log = logging.getLogger(__name__)
@@ -11,10 +12,22 @@ tz = zoneinfo.ZoneInfo('America/Chicago')
 
 
 class File:
-    def __init__(self, file_path: pathlib.Path, suffix: str, notes: str):
+    def __init__(self, file_path: pathlib.Path, file_id: str, notes: str):
         self.file_path = file_path
-        self.suffix = suffix
+        self.id = file_id
         self.notes = notes
+
+    @property
+    def card(self) -> fx.FT:
+        return fx.Div(cls='card mb-2')(
+            fx.Video(cls='card-img-top', controls=True, preload='metadata',
+                     src=flask.url_for('files_get', file_id=self.id)),
+            fx.Div(cls='card-body')(
+                fx.H5(cls='card-title')(self.file_path.name),
+                fx.H6(cls='card-subtitle mb-2 text-body-secondary')(self.file_path.parent),
+                fx.P(cls='card-text')(self.notes or '(No notes)'),
+            )
+        )
 
 
 class Location:
@@ -48,6 +61,34 @@ class Location:
         )
 
 
+class SuffixCount:
+    thead: fx.FT = fx.Thead(
+        fx.Tr(
+            fx.Th('Suffix'),
+            fx.Th('Scanned files'),
+            fx.Th(cls='text-center')('Enabled')
+        )
+    )
+
+    def __init__(self, suffix: str, count: int, enabled: bool):
+        self.suffix = suffix
+        self.count = count
+        self.enabled = enabled
+
+    @property
+    def tr(self) -> fx.FT:
+        return fx.Tr(
+            fx.Td(fx.Code(self.suffix)),
+            fx.Td(cls='text-end')(self.count),
+            fx.Td(cls='ps-4 text-center')(
+                fx.Div(cls='form-check form-switch')(
+                    fx.Input(checked=self.enabled, cls='form-check-input', hx_post=flask.url_for('suffixes_enable'),
+                             name=f'enabled{self.suffix}', type='checkbox'),
+                )
+            )
+        )
+
+
 class VideoIndexModel(fort.SQLiteDatabase):
     _version: int = None
 
@@ -72,17 +113,48 @@ class VideoIndexModel(fort.SQLiteDatabase):
     def files_add(self, file_path: pathlib.Path):
         sql = '''
             insert into files (
-                file_path, suffix, scanned, last_scanned_at
+                file_path, id, suffix, last_scanned_at
             ) values (
-                :file_path, :suffix, 1, :last_scanned_at
-            )
+                :file_path, :id, :suffix, :last_scanned_at
+            ) on conflict (file_path) do update set
+                scanned = 1, last_scanned_at = excluded.last_scanned_at
         '''
         params = {
             'file_path': str(file_path),
+            'id': secrets.token_urlsafe(8),
             'suffix': file_path.suffix,
             'last_scanned_at': datetime.datetime.now(datetime.UTC).isoformat(),
         }
         self.u(sql, params)
+
+    def files_get(self, file_id: str) -> File|None:
+        sql = '''
+            select file_path, id, notes
+            from files
+            where id = :id
+        '''
+        params = {
+            'id': file_id,
+        }
+        f = self.q_one(sql, params)
+        if f:
+            return File(pathlib.Path(f['file_path']).resolve(), f['id'], f['notes'])
+
+    def files_list(self, after: str = '') -> list[File]:
+        sql = '''
+            select f.file_path, f.id, f.last_scanned_at, f.notes
+            from files f
+            join suffixes s on s.suffix = f.suffix
+            where f.scanned = 1 and s.enabled = 1 and f.file_path > :after
+            order by f.file_path limit 10
+        '''
+        params = {
+            'after': after,
+        }
+        return [
+            File(pathlib.Path(row['file_path']).resolve(), row['id'], row['notes'])
+            for row in self.q(sql, params)
+        ]
 
     def locations_add(self, root_folder: str):
         sql = '''
@@ -182,13 +254,46 @@ class VideoIndexModel(fort.SQLiteDatabase):
             self.u('''
                 create table files (
                     file_path text primary key,
-                    suffix text,
-                    scanned integer,
-                    last_scanned_at text,
-                    notes text
+                    id text not null,
+                    suffix text not null,
+                    scanned integer not null default 1,
+                    last_scanned_at text not null,
+                    notes text not null default ''
+                )
+            ''')
+            self.u('''
+                create table suffixes (
+                    suffix text primary key,
+                    enabled integer not null default 0
                 )
             ''')
             self.version = 1
+
+    def suffixes_count(self) -> list[SuffixCount]:
+        sql = '''
+            with c as (
+                select suffix, count(*) file_count
+                from files
+                where length(suffix) > 0
+                group by suffix
+            )
+            select c.suffix, c.file_count, coalesce(s.enabled, 0) as enabled
+            from c
+            left join suffixes s on s.suffix = c.suffix
+            order by c.suffix
+        '''
+        return [SuffixCount(row['suffix'], row['file_count'], bool(row['enabled'])) for row in self.q(sql)]
+
+    def suffixes_enable(self, suffix: str, enabled: bool):
+        sql = '''
+            insert into suffixes (suffix, enabled) values (:suffix, :enabled)
+            on conflict (suffix) do update set enabled = excluded.enabled
+        '''
+        params = {
+            'suffix': suffix,
+            'enabled': int(enabled),
+        }
+        self.u(sql, params)
 
     @property
     def version(self) -> int:
