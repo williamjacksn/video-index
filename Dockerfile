@@ -13,3 +13,9 @@ ENV HOME="/home/python" \
     PYTHONDONTWRITEBYTECODE="1" \
     PYTHONUNBUFFERED="1" \
     TZ="Etc/UTC"
+
+WORKDIR /home/python/video-index
+ENTRYPOINT ["/home/python/venv/bin/python", "/home/python/video-index/run.py"]
+
+COPY --chown=python:python run.py /home/python/video-index/run.py
+COPY --chown=python:python video_index /home/python/video-index/video_index
