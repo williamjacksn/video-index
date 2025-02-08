@@ -157,16 +157,25 @@ class VideoIndexModel(fort.SQLiteDatabase):
         if f:
             return File(pathlib.Path(f['file_path']).resolve(), f['id'], f['notes'])
 
-    def files_list(self, after: str = '') -> list[File]:
-        sql = '''
+    def files_list(self, after: str = '', missing_notes_only: bool = False, q: str = None) -> list[File]:
+        where_clause = 'f.scanned = 1 and s.enabled = 1 and f.file_path > :after'
+        if missing_notes_only:
+            where_clause = f'{where_clause} and length(f.notes) = 0'
+        if q:
+            where_clause = f'''
+                {where_clause} and
+                instr(lower(f.file_path || ' ' || f.notes), lower(:q)) > 0
+            '''
+        sql = f'''
             select f.file_path, f.id, f.last_scanned_at, f.notes
             from files f
             join suffixes s on s.suffix = f.suffix
-            where f.scanned = 1 and s.enabled = 1 and f.file_path > :after
-            order by f.file_path limit 10
+            where {where_clause}
+            order by f.file_path limit 5
         '''
         params = {
             'after': after,
+            'q': q,
         }
         return [
             File(pathlib.Path(row['file_path']).resolve(), row['id'], row['notes'])

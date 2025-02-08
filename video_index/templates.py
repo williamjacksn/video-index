@@ -100,6 +100,10 @@ def files_editable_note(file: m.File) -> str:
     return fx.to_xml(file.editable_note)
 
 
+def files_list(files: list[m.File]) -> str:
+    return ''.join(fx.to_xml(f.card) for f in files)
+
+
 def files_update_notes(file: m.File) -> str:
     return fx.to_xml(file.notes_control)
 
@@ -107,7 +111,20 @@ def files_update_notes(file: m.File) -> str:
 def index(files: list[m.File]) -> str:
     content_col = fx.Div(cls='col-12 col-sm-9 col-md-7 col-lg-6 col-xl-5 col-xxl-4')
     if files:
-        content_col(*(f.card for f in files))
+        content_col(
+            fx.Form(hx_target='#video-cards')(
+                fx.Input(cls='form-control mb-2', hx_post=flask.url_for('files_cards'),
+                         hx_trigger='search, keyup changed delay:300ms', name='q', placeholder='Search...',
+                         type='search'),
+                fx.Div(cls='form-check form-switch mb-2')(
+                    fx.Input(cls='form-check-input', hx_post=flask.url_for('files_cards'), id='missing-notes-only',
+                             name='missing-notes-only', type='checkbox'),
+                    fx.Label(cls='form-check-Label', _for='missing-notes-only')('Only show files missing notes')
+                )
+            ),
+            fx.Div(hx_include='previous form', hx_post=flask.url_for('files_cards'), hx_trigger='load',
+                   id='video-cards'),
+        )
     else:
         content_col(
             'No files found. Scan a ',
