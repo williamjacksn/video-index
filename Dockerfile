@@ -17,5 +17,6 @@ ENV HOME="/home/python" \
 WORKDIR /home/python/video-index
 ENTRYPOINT ["/home/python/venv/bin/python", "/home/python/video-index/run.py"]
 
+COPY --chown=python:python package.json /home/python/video-index/package.json
 COPY --chown=python:python run.py /home/python/video-index/run.py
 COPY --chown=python:python video_index /home/python/video-index/video_index
