@@ -8,6 +8,7 @@ scheduler = apscheduler.schedulers.background.BackgroundScheduler()
 
 
 def scan_location(root_folder: pathlib.Path):
+    log.info(f'Scanning location {root_folder}')
     model = m.get_model()
     model.locations_scan_start(root_folder)
     folders = [root_folder]
@@ -20,3 +21,4 @@ def scan_location(root_folder: pathlib.Path):
             else:
                 model.files_add(item)
     model.locations_scan_complete(root_folder)
+    log.info(f'Done scanning location {root_folder}')
