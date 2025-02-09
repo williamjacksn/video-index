@@ -101,7 +101,19 @@ def files_editable_note(file: m.File) -> str:
 
 
 def files_list(files: list[m.File]) -> str:
-    return ''.join(fx.to_xml(f.card) for f in files)
+    cards = []
+    for i, f in enumerate(files):
+        last_id = ''
+        if i < 5:
+            cards.append(f.card)
+            last_id = f.id
+        else:
+            form = fx.Div(cls='card mb-2', hx_include='#card-filters', hx_post=flask.url_for('files_cards'),
+                          hx_swap='outerHTML', hx_trigger='revealed')(
+                fx.Input(name='after', type='hidden', value=last_id)
+            )
+            cards.append(form)
+    return ''.join(map(fx.to_xml, cards))
 
 
 def files_update_notes(file: m.File) -> str:
@@ -112,7 +124,7 @@ def index(files: list[m.File]) -> str:
     content_col = fx.Div(cls='col-12 col-sm-9 col-md-7 col-lg-6 col-xl-5 col-xxl-4')
     if files:
         content_col(
-            fx.Form(hx_target='#video-cards')(
+            fx.Form(hx_target='#video-cards', id='card-filters')(
                 fx.Input(cls='form-control mb-2', hx_post=flask.url_for('files_cards'),
                          hx_trigger='search, keyup changed delay:300ms', name='q', placeholder='Search...',
                          type='search'),

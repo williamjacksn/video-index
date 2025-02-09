@@ -171,7 +171,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
             from files f
             join suffixes s on s.suffix = f.suffix
             where {where_clause}
-            order by f.file_path limit 5
+            order by f.file_path limit 6
         '''
         params = {
             'after': after,
