@@ -102,16 +102,15 @@ def files_editable_note(file: m.File) -> str:
 
 def files_list(files: list[m.File]) -> str:
     cards = []
+    last_path = ''
     for i, f in enumerate(files):
-        last_id = ''
         if i < 5:
             cards.append(f.card)
-            last_id = f.id
+            last_path = f.file_path
         else:
-            form = fx.Div(cls='card mb-2', hx_include='#card-filters', hx_post=flask.url_for('files_cards'),
-                          hx_swap='outerHTML', hx_trigger='revealed')(
-                fx.Input(name='after', type='hidden', value=last_id)
-            )
+            form = fx.Div(cls='card mb-2', hx_include='#card-filters',
+                          hx_post=flask.url_for('files_cards', after=last_path), hx_swap='outerHTML',
+                          hx_trigger='revealed')
             cards.append(form)
     return ''.join(map(fx.to_xml, cards))
 
