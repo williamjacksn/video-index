@@ -19,8 +19,7 @@ def before_request():
 
 @app.route('/')
 def index():
-    files = m.get_model().files_list()
-    return te.index(files)
+    return te.index()
 
 
 @app.route('/favicon.svg')

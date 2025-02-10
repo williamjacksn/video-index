@@ -19,15 +19,17 @@ class File:
 
     @property
     def card(self) -> fx.FT:
-        return fx.Div(cls='card mb-2')(
-            fx.Video(cls='card-img-top', controls=True, preload='metadata',
-                     src=flask.url_for('files_get', file_id=self.id)),
-            fx.Div(cls='card-body')(
-                fx.H5(cls='card-title')(self.file_path.name),
-                fx.H6(cls='card-subtitle mb-2 text-body-secondary')(
-                    fx.Small(self.file_path.parent)
-                ),
-                self.notes_control,
+        return fx.Div(cls='col pb-3')(
+            fx.Div(cls='card h-100')(
+                fx.Video(cls='card-img-top', controls=True, preload='metadata',
+                         src=flask.url_for('files_get', file_id=self.id)),
+                fx.Div(cls='card-body')(
+                    fx.H5(cls='card-title')(self.file_path.name),
+                    fx.H6(cls='card-subtitle mb-2 text-body-secondary')(
+                        fx.Small(self.file_path.parent)
+                    ),
+                    self.notes_control,
+                )
             )
         )
 

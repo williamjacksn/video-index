@@ -72,9 +72,19 @@ def _nav(active_page: str = 'files') -> fx.FT:
                 fx.A(cls=cls, href=p.get('href'))(p.get('title'))
             )
         )
-    return fx.Nav(cls='pt-3 row')(
-        fx.Div(cls='col-12')(
+    return fx.Nav(cls='align-items-center pt-3 row')(
+        fx.Div(cls='col-11')(
             nav_ul
+        ),
+        fx.Div(cls='col text-end')(
+            fx.Small(
+                fx.Span(cls='d-inline d-sm-none')('xs'),
+                fx.Span(cls='d-none d-sm-inline d-md-none')('sm'),
+                fx.Span(cls='d-none d-md-inline d-lg-none')('md'),
+                fx.Span(cls='d-none d-lg-inline d-xl-none')('lg'),
+                fx.Span(cls='d-none d-xl-inline d-xxl-none')('xl'),
+                fx.Span(cls='d-none d-xxl-inline')('xxl')
+            )
         )
     )
 
@@ -101,6 +111,17 @@ def files_editable_note(file: m.File) -> str:
 
 
 def files_list(files: list[m.File]) -> str:
+    if len(files) < 1:
+        return fx.to_xml(
+            fx.Div(cls='col pb-3')(
+                'No files found. Adjust your filters or scan a ',
+                fx.A(href=flask.url_for('locations'))('location'),
+                ' and enable a ',
+                fx.A(href=flask.url_for('suffixes'))('suffix'),
+                ' first.'
+            )
+        )
+
     cards = []
     last_path = ''
     for i, f in enumerate(files):
@@ -108,10 +129,11 @@ def files_list(files: list[m.File]) -> str:
             cards.append(f.card)
             last_path = f.file_path
         else:
-            form = fx.Div(cls='card mb-2', hx_include='#card-filters',
-                          hx_post=flask.url_for('files_cards', after=last_path), hx_swap='outerHTML',
-                          hx_trigger='revealed')
-            cards.append(form)
+            cards.append(
+                fx.Div(cls='col pb-3', hx_include='#card-filters',
+                       hx_post=flask.url_for('files_cards', after=last_path), hx_swap='outerHTML',
+                       hx_trigger='revealed')
+            )
     return ''.join(map(fx.to_xml, cards))
 
 
@@ -119,34 +141,25 @@ def files_update_notes(file: m.File) -> str:
     return fx.to_xml(file.notes_control)
 
 
-def index(files: list[m.File]) -> str:
-    content_col = fx.Div(cls='col-12 col-sm-9 col-md-7 col-lg-6 col-xl-5 col-xxl-4')
-    if files:
-        content_col(
-            fx.Form(hx_target='#video-cards', id='card-filters')(
+def index() -> str:
+    return fx.to_xml(_base(
+        _nav(active_page='files'),
+        fx.Form(cls='align-items-center pt-3 row', hx_target='#video-cards', id='card-filters')(
+            fx.Div(cls='col-auto')(
                 fx.Input(cls='form-control mb-2', hx_post=flask.url_for('files_cards'),
                          hx_trigger='search, keyup changed delay:300ms', name='q', placeholder='Search...',
-                         type='search'),
+                         type='search')
+            ),
+            fx.Div(cls='col-auto')(
                 fx.Div(cls='form-check form-switch mb-2')(
                     fx.Input(cls='form-check-input', hx_post=flask.url_for('files_cards'), id='missing-notes-only',
                              name='missing-notes-only', type='checkbox'),
                     fx.Label(cls='form-check-Label', _for='missing-notes-only')('Only show files missing notes')
                 )
-            ),
-            fx.Div(hx_include='previous form', hx_post=flask.url_for('files_cards'), hx_trigger='load',
-                   id='video-cards'),
-        )
-    else:
-        content_col(
-            'No files found. Scan a ',
-            fx.A(href=flask.url_for('locations'))('location'),
-            ' and enable a ',
-            fx.A(href=flask.url_for('suffixes'))('suffix'),
-            ' first.'
-        )
-    return fx.to_xml(_base(
-        _nav(active_page='files'),
-        fx.Main(cls='pt-3 row')(content_col)
+            )
+        ),
+        fx.Div(cls='pt-3 row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-4', hx_include='#card-filters',
+               hx_post=flask.url_for('files_cards'), hx_trigger='load', id='video-cards')
     ))
 
 
