@@ -28,6 +28,16 @@ def _base(*args: fx.FT) -> fx.FT:
             )
         ),
         fx.Body(
+            fx.Div(cls='top-0 end-0 m-3 position-absolute z-n1')(
+                fx.Small(cls='badge text-bg-dark')(
+                    fx.Span(cls='d-inline d-sm-none')('xs'),
+                    fx.Span(cls='d-none d-sm-inline d-md-none')('sm'),
+                    fx.Span(cls='d-none d-md-inline d-lg-none')('md'),
+                    fx.Span(cls='d-none d-lg-inline d-xl-none')('lg'),
+                    fx.Span(cls='d-none d-xl-inline d-xxl-none')('xl'),
+                    fx.Span(cls='d-none d-xxl-inline')('xxl')
+                )
+            ),
             fx.Div(cls='container-fluid')(*args),
             fx.Script(
                 crossorigin='anonymous',
@@ -73,18 +83,8 @@ def _nav(active_page: str = 'files') -> fx.FT:
             )
         )
     return fx.Nav(cls='align-items-center pt-3 row')(
-        fx.Div(cls='col-11')(
+        fx.Div(cls='col-12')(
             nav_ul
-        ),
-        fx.Div(cls='col text-end')(
-            fx.Small(
-                fx.Span(cls='d-inline d-sm-none')('xs'),
-                fx.Span(cls='d-none d-sm-inline d-md-none')('sm'),
-                fx.Span(cls='d-none d-md-inline d-lg-none')('md'),
-                fx.Span(cls='d-none d-lg-inline d-xl-none')('lg'),
-                fx.Span(cls='d-none d-xl-inline d-xxl-none')('xl'),
-                fx.Span(cls='d-none d-xxl-inline')('xxl')
-            )
         )
     )
 
