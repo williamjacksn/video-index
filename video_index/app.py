@@ -101,4 +101,4 @@ def suffixes_enable():
 def main():
     m.get_model().migrate()
     ta.scheduler.start()
-    waitress.serve(app, ident=None)
+    waitress.serve(app, ident=None, threads=8)
