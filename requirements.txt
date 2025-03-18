@@ -10,7 +10,7 @@ blinker==1.9.0
     # via flask
 click==8.1.8
     # via flask
-fastcore==1.7.29
+fastcore==1.8.0
     # via -r requirements.in
 flask==3.1.0
     # via -r requirements.in
