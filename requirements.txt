@@ -16,12 +16,15 @@ flask==3.1.0
     # via -r requirements.in
 fort==2024.2
     # via -r requirements.in
+htpy==25.3.0
+    # via -r requirements.in
 itsdangerous==2.2.0
     # via flask
 jinja2==3.1.6
     # via flask
 markupsafe==3.0.2
     # via
+    #   htpy
     #   jinja2
     #   werkzeug
 notch==2023.1
