@@ -1,7 +1,7 @@
 import datetime
-import fastcore.xml as fx
 import flask
 import fort
+import htpy
 import logging
 import pathlib
 import secrets
@@ -18,47 +18,45 @@ class File:
         self.notes = notes
 
     @property
-    def card(self) -> fx.FT:
-        return fx.Div(cls='col pb-3')(
-            fx.Div(cls='card h-100')(
-                fx.Video(cls='card-img-top', controls=True, preload='metadata',
-                         src=flask.url_for('files_get', file_id=self.id)),
-                fx.Div(cls='card-body')(
-                    fx.H5(cls='card-title')(self.file_path.name),
-                    fx.H6(cls='card-subtitle mb-2 text-body-secondary')(
-                        fx.Small(self.file_path.parent)
-                    ),
+    def card(self) -> htpy.Element:
+        return htpy.div('.col.pb-3')[
+            htpy.div('.card.h-100')[
+                htpy.video('.card-img-top', controls=True, preload='metadata',
+                           src=flask.url_for('files_get', file_id=self.id)),
+                htpy.div('.card-body')[
+                    htpy.h5('.card-title')[self.file_path.name],
+                    htpy.h6('.card-subtitle.mb-2.text-body-secondary')[
+                        htpy.small[str(self.file_path.parent)]
+                    ],
                     self.notes_control,
-                )
-            )
-        )
+                ]
+            ]
+        ]
 
     @property
-    def editable_note(self) -> fx.FT:
-        return fx.Form(hx_post=flask.url_for('files_update_notes', file_id=self.id), hx_swap='outerHTML')(
-            fx.Input(name='file-id', type='hidden', value=self.id),
-            fx.Textarea(cls='form-control mb-2', name='notes')(self.notes),
-            fx.Button(cls='btn btn-outline-primary', type='submit')('Save')
-        )
+    def editable_note(self) -> htpy.Element:
+        return htpy.form(hx_post=flask.url_for('files_update_notes', file_id=self.id), hx_swap='outerHTML')[
+            htpy.input(name='file-id', type='hidden', value=self.id),
+            htpy.textarea('.form-control.mb-2', name='notes')[self.notes],
+            htpy.button('.btn.btn-outline-primary', type='submit')['Save']
+        ]
 
     @property
-    def notes_control(self) -> fx.FT:
-        return fx.P(cls='card-text', hx_get=flask.url_for('files_editable_note', file_id=self.id),
-                    hx_swap='outerHTML', role='button')(
-            self.notes or '(No notes)'
-        )
+    def notes_control(self) -> htpy.Element:
+        return htpy.p('.card-text', hx_get=flask.url_for('files_editable_note', file_id=self.id),
+                      hx_swap='outerHTML', role='button')[self.notes or '(No notes)']
 
 
 class Location:
     col_count: int = 4
-    thead: fx.FT = fx.Thead(
-        fx.Tr(
-            fx.Th('Root folder'),
-            fx.Th('Last scan started'),
-            fx.Th('Last scan completed'),
-            fx.Th()
-        )
-    )
+    thead: htpy.Element = htpy.thead[
+        htpy.tr[
+            htpy.th['Root folder'],
+            htpy.th['Last scan started'],
+            htpy.th['Last scan completed'],
+            htpy.th,
+        ]
+    ]
 
     def __init__(self, root_folder: pathlib.Path, last_scan_started_at: datetime.datetime, last_scan_completed_at: datetime.datetime):
         self.root_folder = root_folder
@@ -66,28 +64,28 @@ class Location:
         self.last_scan_completed_at = last_scan_completed_at
 
     @property
-    def tr(self) -> fx.FT:
-        return fx.Tr()(
-            fx.Td(fx.Code(self.root_folder)),
-            fx.Td(self.last_scan_started_at.astimezone(tz) if self.last_scan_started_at else ''),
-            fx.Td(self.last_scan_completed_at.astimezone(tz) if self.last_scan_completed_at else ''),
-            fx.Td(
-                fx.Button(cls='btn btn-outline-primary btn-sm', hx_post=flask.url_for('locations_scan'),
-                          name='root-folder', title='Scan now', value=self.root_folder, type='button')(
-                    fx.I(cls='bi-search')
-                )
-            )
-        )
+    def tr(self) -> htpy.Element:
+        return htpy.tr[
+            htpy.td[htpy.code[str(self.root_folder)]],
+            htpy.td[self.last_scan_started_at and self.last_scan_started_at.astimezone(tz).isoformat()],
+            htpy.td[self.last_scan_completed_at and self.last_scan_completed_at.astimezone(tz).isoformat()],
+            htpy.td[
+                htpy.td('.btn.btn-outline-primary.btn-sm', hx_post=flask.url_for('locations_scan'),
+                        name='root-folder', title='Scan now', value=str(self.root_folder), type='button')[
+                    htpy.i('.bi-search')
+                ]
+            ]
+        ]
 
 
 class SuffixCount:
-    thead: fx.FT = fx.Thead(
-        fx.Tr(
-            fx.Th('Suffix'),
-            fx.Th('Scanned files'),
-            fx.Th(cls='text-center')('Enabled')
-        )
-    )
+    thead: htpy.Element = htpy.thead[
+        htpy.tr[
+            htpy.th['Suffix'],
+            htpy.th['Scanned files'],
+            htpy.th('.text-center')['Enabled']
+        ]
+    ]
 
     def __init__(self, suffix: str, count: int, enabled: bool):
         self.suffix = suffix
@@ -95,17 +93,17 @@ class SuffixCount:
         self.enabled = enabled
 
     @property
-    def tr(self) -> fx.FT:
-        return fx.Tr(
-            fx.Td(fx.Code(self.suffix)),
-            fx.Td(cls='text-end')(self.count),
-            fx.Td(cls='ps-4 text-center')(
-                fx.Div(cls='form-check form-switch')(
-                    fx.Input(checked=self.enabled, cls='form-check-input', hx_post=flask.url_for('suffixes_enable'),
-                             name=f'enabled{self.suffix}', type='checkbox'),
-                )
-            )
-        )
+    def tr(self) -> htpy.Element:
+        return htpy.tr[
+            htpy.td[htpy.code[self.suffix]],
+            htpy.td('.text-end')[self.count],
+            htpy.td('.ps-4.text-center')[
+                htpy.div('.form-check.form-switch')[
+                    htpy.input('.form-check-input', checked=self.enabled, hx_post=flask.url_for('suffixes_enable'),
+                               name=f'enabled{self.suffix}', type='checkbox'),
+                ]
+            ]
+        ]
 
 
 class VideoIndexModel(fort.SQLiteDatabase):
