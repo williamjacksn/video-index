@@ -1,0 +1,14 @@
+[project]
+name = "video-index"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "apscheduler>=3.11.0",
+    "flask>=3.1.0",
+    "fort>=2024.2",
+    "htpy>=25.4.2",
+    "notch>=2023.1",
+    "waitress>=3.0.2",
+]
