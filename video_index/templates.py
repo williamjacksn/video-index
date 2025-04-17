@@ -92,16 +92,16 @@ def favicon() -> str:
                 '3v2h2v-2zm2 3h-2v2h2z')
     content = htpy.svg('.bi.bi-film', fill='currentColor', height='16', viewBox='0 0 16 16', width='16',
                        xmlns='http://www.w3.org/2000/svg')[htpy.path(d=svg_path)]
-    return htpy.render_node(content)
+    return str(content)
 
 
 def files_editable_note(file: m.File) -> str:
-    return htpy.render_node(file.editable_note)
+    return str(file.editable_note)
 
 
 def files_list(files: list[m.File]) -> str:
     if len(files) < 1:
-        return htpy.render_node(
+        return str(
             htpy.div('.col.pb-3')[
                 'No files found. Adjust your filters or scan a ',
                 htpy.a(href=flask.url_for('locations'))['location'],
@@ -123,15 +123,15 @@ def files_list(files: list[m.File]) -> str:
                          hx_post=flask.url_for('files_cards', after=last_path), hx_swap='outerHTML',
                          hx_trigger='revealed')
             )
-    return ''.join(map(htpy.render_node, cards))
+    return str(htpy.fragment[cards])
 
 
 def files_update_notes(file: m.File) -> str:
-    return htpy.render_node(file.notes_control)
+    return str(file.notes_control)
 
 
 def index() -> str:
-    return htpy.render_node(_base([
+    return str(_base([
         _nav(active_page='files'),
         htpy.form('#card-filters.align-items-center.pt-3.row', hx_target='#video-cards')[
             htpy.div('.col-auto')[
@@ -163,7 +163,7 @@ def locations(locs: list[m.Location]) -> str:
                 htpy.td('.text-center', colspan=m.Location.col_count)['No locations found']
             ]
         )
-    return htpy.render_node(_base([
+    return str(_base([
         _nav(active_page='locations'),
         htpy.form('.g-1.pt-3.row', action=flask.url_for('locations_add'), method='post')[
             htpy.div('.col-auto')[
@@ -199,7 +199,7 @@ def suffixes(suffix_counts: list[m.SuffixCount]) -> str:
             htpy.a(href=flask.url_for('locations'))['location'],
             ' first.'
         ]
-    return htpy.render_node(_base([
+    return str(_base([
         _nav(active_page='suffixes'),
         htpy.div('.pt-3.row')[
             htpy.div('.col')[content]
