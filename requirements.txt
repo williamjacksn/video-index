@@ -25,7 +25,7 @@ markupsafe==3.0.2
     #   htpy
     #   jinja2
     #   werkzeug
-notch==2023.1
+notch==2025.2
     # via -r requirements.in
 tzlocal==5.3.1
     # via apscheduler
