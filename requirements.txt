@@ -12,7 +12,7 @@ click==8.1.8
     # via flask
 flask==3.1.0
     # via -r requirements.in
-fort==2024.2
+fort==2025.0
     # via -r requirements.in
 htpy==25.4.2
     # via -r requirements.in
