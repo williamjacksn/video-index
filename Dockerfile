@@ -1,21 +1,22 @@
+FROM ghcr.io/astral-sh/uv:0.7.3 AS uv
 FROM python:3.13-slim
 
+COPY --from=uv /uv /bin/uv
+
 RUN /usr/sbin/useradd --create-home --shell /bin/bash --user-group python
-
 USER python
-RUN /usr/local/bin/python -m venv /home/python/venv
 
-COPY --chown=python:python requirements.txt /home/python/video-index/requirements.txt
-RUN /home/python/venv/bin/pip install --no-cache-dir --requirement /home/python/video-index/requirements.txt
+COPY --chown=python:python .python-version /home/python/video-index/.python-version
+COPY --chown=python:python pyproject.toml /home/python/video-index/pyproject.toml
+COPY --chown=python:python uv.lock /home/python/video-index/uv.lock
+WORKDIR /home/python/video-index
+RUN /bin/uv sync --frozen
 
-ENV HOME="/home/python" \
-    PATH="/home/python/venv/bin:${PATH}" \
-    PYTHONDONTWRITEBYTECODE="1" \
+ENV PYTHONDONTWRITEBYTECODE="1" \
     PYTHONUNBUFFERED="1" \
     TZ="Etc/UTC"
 
-WORKDIR /home/python/video-index
-ENTRYPOINT ["/home/python/venv/bin/python", "/home/python/video-index/run.py"]
+ENTRYPOINT ["/bin/uv", "run", "run.py"]
 
 COPY --chown=python:python package.json /home/python/video-index/package.json
 COPY --chown=python:python run.py /home/python/video-index/run.py

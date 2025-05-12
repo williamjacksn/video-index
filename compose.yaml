@@ -11,15 +11,6 @@ services:
       - ./:/home/python/video-index
     working_dir: /home/python/video-index
 
-  pip-compile:
-    entrypoint:
-      - /home/python/venv/bin/pip-compile
-    image: ghcr.io/williamjacksn/pip-tools:py3.13
-    init: true
-    volumes:
-      - ./:/home/python/video-index
-    working_dir: /home/python/video-index
-
   shell:
     entrypoint:
       - /bin/bash
