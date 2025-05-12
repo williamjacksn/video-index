@@ -17,13 +17,11 @@ def _base(content: htpy.Node) -> htpy.Element:
             htpy.link(
                 crossorigin="anonymous",
                 href=f"https://unpkg.com/bootstrap@{v.bs}/dist/css/bootstrap.css",
-                integrity="sha384-qAlWxD5RDF+aEdUc1Z7GR/tE4zYjX1Igo/LrIexlnzM6G63a6F1fXZWpZKSrSW86",
                 rel="stylesheet",
             ),
             htpy.link(
                 crossorigin="anonymous",
                 href=f"https://unpkg.com/bootstrap-icons@{v.bi}/font/bootstrap-icons.css",
-                integrity="sha384-tViUnnbYAV00FLIhhi3v/dWt3Jxw4gZQcNoSCxCIFNJVCx7/D55/wXsrNIRANwdD",
                 rel="stylesheet",
             ),
         ],
@@ -41,12 +39,10 @@ def _base(content: htpy.Node) -> htpy.Element:
             htpy.div(".container-fluid")[content],
             htpy.script(
                 crossorigin="anonymous",
-                integrity="sha384-5xO2n1cyGKAe630nacBqFQxWoXjUIkhoc/FxQrWM07EIZ3TuqkAsusDeyPDOIeid",
                 src=f"https://unpkg.com/bootstrap@{v.bs}/dist/js/bootstrap.bundle.js",
             ),
             htpy.script(
                 crossorigin="anonymous",
-                integrity="sha384-oeUn82QNXPuVkGCkcrInrS1twIxKhkZiFfr2TdiuObZ3n3yIeMiqcRzkIcguaof1",
                 src=f"https://unpkg.com/htmx.org@{v.hx}/dist/htmx.js",
             ),
         ],
