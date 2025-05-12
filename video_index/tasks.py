@@ -8,17 +8,17 @@ scheduler = apscheduler.schedulers.background.BackgroundScheduler()
 
 
 def scan_location(root_folder: pathlib.Path):
-    log.info(f'Scanning location {root_folder}')
+    log.info(f"Scanning location {root_folder}")
     model = m.get_model()
     model.locations_scan_start(root_folder)
     folders = [root_folder]
     while folders:
         folder = folders.pop()
-        log.debug(f'Scanning {folder}')
+        log.debug(f"Scanning {folder}")
         for item in folder.iterdir():
             if item.is_dir():
                 folders.append(item)
             else:
                 model.files_add(item)
     model.locations_scan_complete(root_folder)
-    log.info(f'Done scanning location {root_folder}')
+    log.info(f"Done scanning location {root_folder}")
