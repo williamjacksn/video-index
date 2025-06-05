@@ -1,16 +1,24 @@
-services:
-  app:
-    image: ghcr.io/williamjacksn/video-index
-    init: true
-    ports:
-      - '8080:8080'
-    volumes:
-      - ./:/app
-
-  shell:
-    entrypoint:
-      - /bin/bash
-    image: ghcr.io/williamjacksn/video-index
-    init: true
-    volumes:
-      - ./:/app
+{
+  "services": {
+    "app": {
+      "image": "ghcr.io/williamjacksn/video-index",
+      "init": true,
+      "ports": [
+        "8080:8080"
+      ],
+      "volumes": [
+        "./:/app"
+      ]
+    },
+    "shell": {
+      "entrypoint": [
+        "/bin/bash"
+      ],
+      "image": "ghcr.io/williamjacksn/video-index",
+      "init": true,
+      "volumes": [
+        "./:/app"
+      ]
+    }
+  }
+}
