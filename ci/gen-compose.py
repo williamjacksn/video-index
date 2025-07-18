@@ -1,4 +1,11 @@
 import gen
+import pathlib
+
+this_file = pathlib.PurePosixPath(
+    pathlib.Path(__file__).relative_to(pathlib.Path().resolve())
+)
+
+target = "compose.yaml"
 
 content = {
     "services": {
@@ -14,7 +21,10 @@ content = {
             "init": True,
             "volumes": ["./:/app"],
         },
-    }
+    },
+    "configs": {
+        "generator": {"content": f"This file ({target}) was generated from {this_file}"}
+    },
 }
 
-gen.gen(content, "compose.yaml")
+gen.gen(content, target)

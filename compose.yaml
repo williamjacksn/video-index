@@ -1,4 +1,9 @@
 {
+  "configs": {
+    "generator": {
+      "content": "This file (compose.yaml) was generated from ci/gen-compose.py"
+    }
+  },
   "services": {
     "app": {
       "image": "ghcr.io/williamjacksn/video-index",
