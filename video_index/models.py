@@ -92,7 +92,7 @@ class Location:
                 and self.last_scan_completed_at.astimezone(tz).isoformat()
             ],
             htpy.td[
-                htpy.td(
+                htpy.button(
                     ".btn.btn-outline-primary.btn-sm",
                     hx_post=flask.url_for("locations_scan"),
                     name="root-folder",
