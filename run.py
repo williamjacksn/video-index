@@ -1,4 +1,5 @@
 import notch
+
 import video_index.app
 
 notch.configure()

@@ -12,3 +12,11 @@ dependencies = [
     "notch>=2023.1",
     "waitress>=3.0.2",
 ]
+
+[tool.ruff.lint]
+select = ["ANN", "E", "F", "FURB", "I", "PERF", "RUF", "S", "UP"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.2",
+]

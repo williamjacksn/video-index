@@ -1,5 +1,6 @@
 import flask
 import htpy
+
 import video_index.models as m
 import video_index.versions as v
 
@@ -83,9 +84,9 @@ def _nav(active_page: str = "files") -> htpy.Element:
 
 def favicon() -> str:
     svg_path = (
-        "M0 1a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm4 0v6h8V1zm8 8H4v6h8zM1 "
-        "1v2h2V1zm2 3H1v2h2zM1 7v2h2V7zm2 3H1v2h2zm-2 3v2h2v-2zM15 1h-2v2h2zm-2 3v2h2V4zm2 3h-2v2h2zm-2 "
-        "3v2h2v-2zm2 3h-2v2h2z"
+        "M0 1a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm4 0v6h8V"
+        "1zm8 8H4v6h8zM1 1v2h2V1zm2 3H1v2h2zM1 7v2h2V7zm2 3H1v2h2zm-2 3v2h2v-2zM15 1h-2"
+        "v2h2zm-2 3v2h2V4zm2 3h-2v2h2zm-2 3v2h2v-2zm2 3h-2v2h2z"
     )
     content = htpy.svg(
         ".bi.bi-film",
@@ -182,18 +183,16 @@ def index() -> str:
 
 
 def locations(locs: list[m.Location]) -> str:
-    trs = []
     if locs:
-        for loc in locs:
-            trs.append(loc.tr)
+        trs = [loc.tr for loc in locs]
     else:
-        trs.append(
+        trs = [
             htpy.tr[
                 htpy.td(".text-center", colspan=m.Location.col_count)[
                     "No locations found"
                 ]
             ]
-        )
+        ]
     return str(
         _base(
             [

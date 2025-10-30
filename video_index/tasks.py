@@ -1,13 +1,15 @@
-import apscheduler.schedulers.background
 import logging
 import pathlib
+
+import apscheduler.schedulers.background
+
 import video_index.models as m
 
 log = logging.getLogger(__name__)
 scheduler = apscheduler.schedulers.background.BackgroundScheduler()
 
 
-def scan_location(root_folder: pathlib.Path):
+def scan_location(root_folder: pathlib.Path) -> None:
     log.info(f"Scanning location {root_folder}")
     model = m.get_model()
     model.locations_scan_start(root_folder)

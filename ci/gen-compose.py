@@ -1,8 +1,9 @@
-import gen
 import pathlib
 
+import gen
+
 this_file = pathlib.PurePosixPath(
-    pathlib.Path(__file__).relative_to(pathlib.Path().resolve())
+    pathlib.Path(__file__).relative_to(pathlib.Path.cwd())
 )
 
 target = "compose.yaml"

@@ -1,18 +1,19 @@
 import datetime
-import flask
-import fort
-import htpy
 import logging
 import pathlib
 import secrets
 import zoneinfo
+
+import flask
+import fort
+import htpy
 
 log = logging.getLogger(__name__)
 tz = zoneinfo.ZoneInfo("America/Chicago")
 
 
 class File:
-    def __init__(self, file_path: pathlib.Path, file_id: str, notes: str):
+    def __init__(self, file_path: pathlib.Path, file_id: str, notes: str) -> None:
         self.file_path = file_path
         self.id = file_id
         self.notes = notes
@@ -74,7 +75,7 @@ class Location:
         root_folder: pathlib.Path,
         last_scan_started_at: datetime.datetime,
         last_scan_completed_at: datetime.datetime,
-    ):
+    ) -> None:
         self.root_folder = root_folder
         self.last_scan_started_at = last_scan_started_at
         self.last_scan_completed_at = last_scan_completed_at
@@ -113,7 +114,7 @@ class SuffixCount:
         ]
     ]
 
-    def __init__(self, suffix: str, count: int, enabled: bool):
+    def __init__(self, suffix: str, count: int, enabled: bool) -> None:
         self.suffix = suffix
         self.count = count
         self.enabled = enabled
@@ -158,7 +159,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
         log.debug(f"Table {table_name!r} not found")
         return False
 
-    def files_add(self, file_path: pathlib.Path):
+    def files_add(self, file_path: pathlib.Path) -> None:
         sql = """
             insert into files (
                 file_path, id, suffix, last_scanned_at
@@ -189,7 +190,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
             return File(pathlib.Path(f["file_path"]).resolve(), f["id"], f["notes"])
 
     def files_list(
-        self, after: str = "", missing_notes_only: bool = False, q: str = None
+        self, after: str = "", missing_notes_only: bool = False, q: str | None = None
     ) -> list[File]:
         where_clause = "f.scanned = 1 and s.enabled = 1 and f.file_path > :after"
         if missing_notes_only:
@@ -205,7 +206,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
             join suffixes s on s.suffix = f.suffix
             where {where_clause}
             order by f.file_path limit 6
-        """
+        """  # noqa: S608
         params = {
             "after": after,
             "q": q,
@@ -215,7 +216,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
             for row in self.q(sql, params)
         ]
 
-    def files_update_notes(self, file_id: str, notes: str):
+    def files_update_notes(self, file_id: str, notes: str) -> None:
         sql = """
             update files
             set notes = :notes
@@ -227,7 +228,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
         }
         self.u(sql, params)
 
-    def locations_add(self, root_folder: str):
+    def locations_add(self, root_folder: str) -> None:
         sql = """
             insert into locations (root_folder) values (:root_folder)
             on conflict (root_folder) do nothing
@@ -277,7 +278,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
             for row in self.q(sql)
         ]
 
-    def locations_scan_complete(self, root_folder: pathlib.Path):
+    def locations_scan_complete(self, root_folder: pathlib.Path) -> None:
         sql = """
             update locations
             set last_scan_completed_at = :last_scan_completed_at
@@ -295,10 +296,11 @@ class VideoIndexModel(fort.SQLiteDatabase):
         """
         self.u(sql, params)
 
-    def locations_scan_start(self, root_folder: pathlib.Path):
+    def locations_scan_start(self, root_folder: pathlib.Path) -> None:
         sql = """
-            update locations
-            set last_scan_started_at = :last_scan_started_at, last_scan_completed_at = null
+            update locations set
+                last_scan_started_at = :last_scan_started_at,
+                last_scan_completed_at = null
             where root_folder = :root_folder
         """
         params = {
@@ -313,7 +315,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
         """
         self.u(sql, params)
 
-    def migrate(self):
+    def migrate(self) -> None:
         log.info(f"Database schema version is {self.version}")
         if self.version < 1:
             log.info("Migrating to database schema version 1")
@@ -366,7 +368,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
             for row in self.q(sql)
         ]
 
-    def suffixes_enable(self, suffix: str, enabled: bool):
+    def suffixes_enable(self, suffix: str, enabled: bool) -> None:
         sql = """
             insert into suffixes (suffix, enabled) values (:suffix, :enabled)
             on conflict (suffix) do update set enabled = excluded.enabled
@@ -393,7 +395,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
         return self._version
 
     @version.setter
-    def version(self, value: int):
+    def version(self, value: int) -> None:
         sql = """
             insert into schema_versions (
                 schema_version, migration_applied_at
@@ -410,5 +412,5 @@ class VideoIndexModel(fort.SQLiteDatabase):
 
 
 def get_model() -> VideoIndexModel:
-    db_path = pathlib.Path().resolve() / ".local/video-index.db"
+    db_path = pathlib.Path(".local/video-index.db").resolve()
     return VideoIndexModel(db_path)

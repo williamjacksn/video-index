@@ -1,6 +1,5 @@
 import gen
 
-
 build = {
     "name": "Build the container image",
     "on": {
@@ -34,7 +33,8 @@ build = {
                 },
                 {
                     "name": "Log in to GitHub container registry",
-                    "if": "github.event_name == 'push' || github.event_name == 'workflow_dispatch'",
+                    "if": "github.event_name == 'push' || "
+                    "github.event_name == 'workflow_dispatch'",
                     "uses": "docker/login-action@v3",
                     "with": {
                         "password": "${{ github.token }}",
@@ -44,7 +44,8 @@ build = {
                 },
                 {
                     "name": "Push latest image to registry",
-                    "if": "github.event_name == 'push' || github.event_name == 'workflow_dispatch'",
+                    "if": "github.event_name == 'push' || "
+                    "github.event_name == 'workflow_dispatch'",
                     "uses": "docker/build-push-action@v6",
                     "with": {
                         "cache-from": "type=gha",
