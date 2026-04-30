@@ -18,5 +18,5 @@ select = ["ANN", "E", "F", "FURB", "I", "PERF", "RUF", "S", "UP"]
 
 [dependency-groups]
 dev = [
-    "ruff>=0.15.11",
+    "ruff>=0.15.12",
 ]
