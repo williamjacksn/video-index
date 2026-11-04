@@ -1,4 +1,4 @@
-import datetime
+import datetime as dt
 import logging
 import pathlib
 import secrets
@@ -73,8 +73,8 @@ class Location:
     def __init__(
         self,
         root_folder: pathlib.Path,
-        last_scan_started_at: datetime.datetime,
-        last_scan_completed_at: datetime.datetime,
+        last_scan_started_at: dt.datetime,
+        last_scan_completed_at: dt.datetime,
     ) -> None:
         self.root_folder = root_folder
         self.last_scan_started_at = last_scan_started_at
@@ -172,7 +172,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
             "file_path": str(file_path),
             "id": secrets.token_urlsafe(8),
             "suffix": file_path.suffix,
-            "last_scanned_at": datetime.datetime.now(datetime.UTC).isoformat(),
+            "last_scanned_at": dt.datetime.now(dt.UTC).isoformat(),
         }
         self.u(sql, params)
 
@@ -251,10 +251,10 @@ class VideoIndexModel(fort.SQLiteDatabase):
         if row:
             return Location(
                 pathlib.Path(row["root_folder"]).resolve(),
-                datetime.datetime.fromisoformat(row["last_scan_started_at"])
+                dt.datetime.fromisoformat(row["last_scan_started_at"])
                 if row["last_scan_started_at"]
                 else None,
-                datetime.datetime.fromisoformat(row["last_scan_completed_at"])
+                dt.datetime.fromisoformat(row["last_scan_completed_at"])
                 if row["last_scan_completed_at"]
                 else None,
             )
@@ -268,10 +268,10 @@ class VideoIndexModel(fort.SQLiteDatabase):
         return [
             Location(
                 pathlib.Path(row["root_folder"]).resolve(),
-                datetime.datetime.fromisoformat(row["last_scan_started_at"])
+                dt.datetime.fromisoformat(row["last_scan_started_at"])
                 if row["last_scan_started_at"]
                 else None,
-                datetime.datetime.fromisoformat(row["last_scan_completed_at"])
+                dt.datetime.fromisoformat(row["last_scan_completed_at"])
                 if row["last_scan_completed_at"]
                 else None,
             )
@@ -286,7 +286,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
         """
         params = {
             "root_folder": str(root_folder),
-            "last_scan_completed_at": datetime.datetime.now(datetime.UTC).isoformat(),
+            "last_scan_completed_at": dt.datetime.now(dt.UTC).isoformat(),
         }
         self.u(sql, params)
         sql = """
@@ -305,7 +305,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
         """
         params = {
             "root_folder": str(root_folder),
-            "last_scan_started_at": datetime.datetime.now(datetime.UTC).isoformat(),
+            "last_scan_started_at": dt.datetime.now(dt.UTC).isoformat(),
         }
         self.u(sql, params)
         sql = """
@@ -404,7 +404,7 @@ class VideoIndexModel(fort.SQLiteDatabase):
             )
         """
         params = {
-            "migration_applied_at": datetime.datetime.now(tz=datetime.UTC).isoformat(),
+            "migration_applied_at": dt.datetime.now(tz=dt.UTC).isoformat(),
             "schema_version": value,
         }
         self.u(sql, params)
